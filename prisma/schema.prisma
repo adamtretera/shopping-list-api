@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+
+}
+
+datasource db {
+  provider = "postgresql"
+  url= env("DATABASE_URL")
+}
+
+
+model User {
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+
+    email String @unique
+    passwordHash String
+    role Role @default(USER)
+
+    firstName String?
+    lastName String?
+
+    shoppingListsMember MembersOnShoppingList[]
+    shoppingListsOwner ShoppingList[]
+
+    @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model ShoppingList {
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    title String
+
+    shoppingListItems ShoppingListItem[]
+    members MembersOnShoppingList[]
+    owner User @relation(fields: [id], references: [id])
+
+    @@map("shoppingLists")
+
+}
+
+model MembersOnShoppingList {
+  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id])
+  shoppingListId Int
+
+  member User @relation(fields: [memberId], references: [id])
+  memberId Int
+
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  @@id([shoppingListId, memberId])
+}
+
+
+model ShoppingListItem {
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+
+    updatedAt DateTime @updatedAt
+    shoppingList ShoppingList @relation(fields: [id], references: [id])
+
+    title String
+
+    @@map("shoppingListItem")
+}
