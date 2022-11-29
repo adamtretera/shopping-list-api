@@ -46,17 +46,17 @@ model ShoppingList {
 
     shoppingListItems ShoppingListItem[]
     members MembersOnShoppingList[]
-    owner User @relation(fields: [id], references: [id])
+    owner User @relation(fields: [id], references: [id], onDelete: Cascade)
 
     @@map("shoppingLists")
 
 }
 
 model MembersOnShoppingList {
-  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id])
+  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
   shoppingListId Int
 
-  member User @relation(fields: [memberId], references: [id])
+  member User @relation(fields: [memberId], references: [id], onDelete: Cascade)
   memberId Int
 
   assignedAt DateTime @default(now())
@@ -71,7 +71,7 @@ model ShoppingListItem {
     createdAt DateTime @default(now())
 
     updatedAt DateTime @updatedAt
-    shoppingList ShoppingList @relation(fields: [id], references: [id])
+    shoppingList ShoppingList @relation(fields: [id], references: [id], onDelete: Cascade)
 
     title String
 

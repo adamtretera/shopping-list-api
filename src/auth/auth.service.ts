@@ -42,13 +42,13 @@ export class AuthService {
         email: dto.email,
       },
     });
+
     if (!user) {
       throw new ForbiddenException('User does not exist');
     }
-
     const passwordMatch = await argon2.verify(user.passwordHash, dto.password);
 
-    if (passwordMatch) {
+    if (!passwordMatch) {
       throw new ForbiddenException('Invalid credentials');
     }
     return this.signToken(user.id, user.email);
