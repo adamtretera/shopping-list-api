@@ -46,8 +46,8 @@ model ShoppingList {
 
     shoppingListItems ShoppingListItem[]
     members MembersOnShoppingList[]
-    owner User @relation(fields: [id], references: [id], onDelete: Cascade)
-
+    owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    ownerId Int
     @@map("shoppingLists")
 
 }
