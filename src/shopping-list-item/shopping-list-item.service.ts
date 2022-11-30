@@ -1,26 +1,68 @@
 import { Injectable } from '@nestjs/common';
 import { CreateShoppingListItemDto } from './dto/create-shopping-list-item.dto';
 import { UpdateShoppingListItemDto } from './dto/update-shopping-list-item.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ShoppingListItemService {
-  create(createShoppingListItemDto: CreateShoppingListItemDto) {
-    return 'This action adds a new shoppingListItem';
+  constructor(private prisma: PrismaService) {}
+
+  async create(
+    userId: number,
+    createShoppingListItemDto: CreateShoppingListItemDto,
+  ) {
+    const shoppingList = await this.prisma.shoppingList.findFirst({
+      where: {
+        OR: [
+          {
+            ownerId: userId,
+          },
+          {
+            members: {
+              some: {
+                memberId: userId,
+              },
+            },
+          },
+        ],
+
+        id: createShoppingListItemDto.shoppingListId,
+      },
+    });
+
+    return this.prisma.shoppingList.update({
+      where: {
+        id: shoppingList.id,
+      },
+      data: { title: createShoppingListItemDto.title },
+    });
   }
 
-  findAll() {
-    return `This action returns all shoppingListItem`;
+  async findOne(userId: number, id: number) {
+    return await this.prisma.shoppingListItem.findFirst({
+      where: {
+        id: id,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shoppingListItem`;
-  }
-
-  update(id: number, updateShoppingListItemDto: UpdateShoppingListItemDto) {
-    return `This action updates a #${id} shoppingListItem`;
+  async update(
+    id: number,
+    updateShoppingListItemDto: UpdateShoppingListItemDto,
+  ) {
+    return this.prisma.shoppingListItem.update({
+      where: {
+        id: id,
+      },
+      data: updateShoppingListItemDto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} shoppingListItem`;
+    return this.prisma.shoppingListItem.delete({
+      where: {
+        id: id,
+      },
+    });
   }
 }

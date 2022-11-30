@@ -12,7 +12,7 @@ import {
 import { Prisma } from '@prisma/client';
 
 import { ShoppingListService } from './shopping-list.service';
-import { CreateShoppingListDto } from './dto';
+import { AddMemberToShoppingListDto, CreateShoppingListDto } from './dto';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/gaurd';
 
@@ -39,19 +39,33 @@ export class ShoppingListController {
     @GetUser('id') userId: number,
     @Param('id', ParseIntPipe) shoppingListId: number,
   ) {
-    return this.shoppingListService.findOne(userId, shoppingListId);
+    return this.shoppingListService.findOne(shoppingListId, userId);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateShoppingListDto: Prisma.ShoppingListUpdateInput,
+    @GetUser('id') userId: number,
   ) {
-    return this.shoppingListService.update(+id, updateShoppingListDto);
+    return this.shoppingListService.update(+id, updateShoppingListDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.shoppingListService.remove(+id);
+  remove(@Param('id') id: string, @GetUser('id') userId: number) {
+    return this.shoppingListService.remove(+id, userId);
+  }
+
+  @Patch(':id/add-member')
+  addMember(
+    @Param('id', ParseIntPipe) shoppingListId: number,
+    @GetUser('id') userId: number,
+    @Body() addMemberToShoppingListDto: AddMemberToShoppingListDto,
+  ) {
+    return this.shoppingListService.addMember(
+      +shoppingListId,
+      userId,
+      addMemberToShoppingListDto,
+    );
   }
 }

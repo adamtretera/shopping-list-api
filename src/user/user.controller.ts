@@ -6,7 +6,7 @@ import { GetUser } from '../auth/decorator';
 @Controller('users')
 export class UserController {
   @Get('me')
-  getMe(@GetUser('id') userId: number) {
-    return userId;
+  getMe(@GetUser() user) {
+    return user;
   }
 }
