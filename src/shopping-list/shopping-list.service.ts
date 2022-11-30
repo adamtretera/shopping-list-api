@@ -8,8 +8,8 @@ import { AddMemberToShoppingListDto } from './dto/add-member-to-shopping-list-dt
 @Injectable()
 export class ShoppingListService {
   constructor(private prisma: PrismaService) {}
-  create(createShoppingListDto: CreateShoppingListDto, userId: number) {
-    const user = this.prisma.user.update({
+  async create(createShoppingListDto: CreateShoppingListDto, userId: number) {
+    const user = await this.prisma.user.update({
       where: { id: userId },
       data: {
         shoppingListsOwner: {
@@ -21,11 +21,11 @@ export class ShoppingListService {
         },
       },
       include: {
-        shoppingListsOwner: true, // Include all posts in the returned object
+        shoppingListsOwner: true,
       },
     });
 
-    return user.shoppingListsOwner();
+    return user.shoppingListsOwner[user.shoppingListsOwner.length - 1];
   }
 
   async findAll(userId: number) {
@@ -186,7 +186,7 @@ export class ShoppingListService {
       data: {
         members: {
           create: {
-            assignedBy: 'test',
+            assignedBy: userId.toString(),
             member: {
               connect: {
                 id: addMemberToShoppingListDto.memberId,
@@ -194,6 +194,9 @@ export class ShoppingListService {
             },
           },
         },
+      },
+      include: {
+        members: true,
       },
     });
   }

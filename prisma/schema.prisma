@@ -60,7 +60,8 @@ model MembersOnShoppingList {
   memberId Int
 
   assignedAt DateTime @default(now())
-  assignedBy String
+  assignedBy User @relation(fields: [assignedById], references: [id], onDelete: Cascade)
+  assignedById Int
 
   @@id([shoppingListId, memberId])
 }
